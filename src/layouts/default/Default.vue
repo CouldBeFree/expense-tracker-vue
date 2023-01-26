@@ -1,12 +1,23 @@
 <template>
   <v-app>
-    <default-bar />
-
-    <default-view />
+    <authentication-view v-if="isAuthRoute" />
+    <dashboard-view v-else />
   </v-app>
 </template>
 
-<script setup>
-  import DefaultBar from './AppBar.vue'
-  import DefaultView from './View.vue'
+<script>
+import DashboardView from "@/layouts/default/DashboardView";
+import AuthenticationView from "@/layouts/default/AuthenticationView";
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+export default {
+  setup() {
+    const route = useRoute();
+    const isAuthRoute = computed(() => route.name === "Login" || route.name === "Registration");
+
+    return { isAuthRoute };
+  },
+  components: { DashboardView, AuthenticationView }
+}
 </script>
