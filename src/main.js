@@ -12,6 +12,7 @@ import { createApp } from 'vue'
 
 // Plugins
 import { registerPlugins } from '@/plugins'
+// import "./plugins/chart.js"
 
 const app = createApp(App)
 

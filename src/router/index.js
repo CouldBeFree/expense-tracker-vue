@@ -28,8 +28,24 @@ const routes = [
         meta: {
           auth: false
         },
-        component: () => import('@/views/Registration'),
+        component: () => import('@/views/Registration.vue'),
       },
+      {
+        path: '/categories',
+        name: 'Categories',
+        meta: {
+          auth: true
+        },
+        component: () => import('@/views/Categories.vue')
+      },
+      {
+        path: '/transactions',
+        name: 'Transactions',
+        meta: {
+          auth: true
+        },
+        component: () => import('@/views/Transaction.vue')
+      }
     ],
   },
 ]

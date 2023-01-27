@@ -28,12 +28,11 @@
 
     <v-btn
       color="primary"
-      class="me-4"
       @click="validate"
     >
       Register
     </v-btn>
-    <p class="mt-5">
+    <p class="mt-2">
       <router-link to="/login">I already have account</router-link>
     </p>
     <v-alert v-if="userError" class="mt-5" type="error">{{userError}}</v-alert>

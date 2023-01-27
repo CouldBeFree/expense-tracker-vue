@@ -21,12 +21,11 @@
 
     <v-btn
       color="primary"
-      class="me-4"
       @click="validate"
     >
       Login
     </v-btn>
-    <p class="mt-5">
+    <p class="mt-2">
       <router-link to="/registration">I don't have account</router-link>
     </p>
     <v-alert v-if="userError" class="mt-5 text-capitalize" type="error">{{userError}}</v-alert>
@@ -35,12 +34,14 @@
 
 <script>
 import axios from "@/utils/axios";
-import router from "@/router";
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: "login-item",
   setup() {
+    const router = useRouter();
+
     const form = ref();
     const valid = ref(false);
     const userError = ref(null);
