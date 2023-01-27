@@ -1,7 +1,12 @@
 <template>
   <v-main>
-    <h1>Authentication View</h1>
-    <router-view />
+    <v-container class="fill-height d-flex align-center justify-center">
+      <v-row>
+        <v-col sm="4" offset="4">
+          <router-view />
+        </v-col>
+      </v-row>
+    </v-container>
   </v-main>
 </template>
 

@@ -35,13 +35,13 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  // history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 })
 
 router.beforeEach((to, from, next) => {
-  // const isAuthenticated = localStorage.getItem('auth');
-  const isAuthenticated = true;
+  const isAuthenticated = localStorage.getItem('expenseToken');
   if (to.meta.auth && !isAuthenticated) {
     next({ path: '/login' });
   } else {
