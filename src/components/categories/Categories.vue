@@ -2,9 +2,13 @@
   <v-container>
     <v-responsive class="d-flex align-center text-center fill-height mt-9">
       <h1 class="mb-4">Categories</h1>
-      <div>
-        {{category}}
-      </div>
+      <v-btn
+        color="success"
+        class="mb-2"
+        @click="onCategoryOpen"
+      >
+        Add new category
+      </v-btn>
       <v-row>
         <v-col sm="6" offset="3">
           <v-card v-if="categories.length" :loading="isLoading">
@@ -36,6 +40,7 @@
                       icon="mdi-pencil"
                       size="x-small"
                       class="mr-1"
+                      @click="onEditOpen({ name: item.name, type: item.type, id: item.id })"
                     ></v-btn>
                     <v-btn
                       class="ml-1"
@@ -115,7 +120,8 @@
             ></v-text-field>
             <v-select
               required
-              label="Select"
+              label="Category Type"
+              placeholder="Select Category Type"
               :rules="typeRule"
               :items="['Expense', 'Income']"
               v-model="category.categoryType"
@@ -128,9 +134,9 @@
           <v-btn
             color="primary"
             variant="text"
-            @click="onCategoryAdd"
+            @click="handleCategory"
           >
-            Add
+            {{category.categoryID.length ? 'Edit' : 'Add'}}
           </v-btn>
           <v-btn
             color="green-darken-1"
@@ -187,10 +193,18 @@ export default {
       itemToRemoveID: null,
     });
 
+    const onEditOpen = (data) => {
+      const { name, type, id } = data;
+      category.categoryName = name;
+      category.categoryID = id;
+      category.categoryType = type;
+      category.categoryDialog = true;
+    }
+
     const onCategoryOpen = () => {
       category.categoryName = '';
       category.categoryID = '';
-      // category.categoryType = '';
+      category.categoryType = '';
       category.categoryDialog = true;
     };
 
@@ -238,19 +252,26 @@ export default {
       }
     };
 
-    const onCategoryAdd = async () => {
+    const handleCategory = async () => {
       isLoading.value = false;
       const { valid } = await form.value.validate();
       if (valid) {
         isLoading.value = true;
         try {
-          await axios.post('/create-category', {
-            name: category.categoryName,
-            type: category.categoryType
-          });
+          if (category.categoryID) {
+            await axios.put(`/category/${category.categoryID}`, {
+              name: category.categoryName,
+              type: category.categoryType
+            });
+          } else {
+            await axios.post('/create-category', {
+              name: category.categoryName,
+              type: category.categoryType
+            });
+          }
           await getCategories();
           snackbar.type = 'success';
-          snackbar.text = 'Category was successfully added';
+          snackbar.text = `Category was successfully ${category.categoryID ? 'updated' : 'added'}`;
         } catch({ message }) {
           snackbar.type = 'error';
           snackbar.text = `${message}`;
@@ -266,7 +287,7 @@ export default {
       getCategories();
     });
 
-    return { categories, isLoading, form, valid, nameRule, typeRule, removeDialog, categoryToRemove, onRemoveClick, onCategoryOpen, remove, onRemove, category, snackbar, onCategoryAdd };
+    return { categories, isLoading, onEditOpen, form, valid, nameRule, typeRule, removeDialog, categoryToRemove, onRemoveClick, onCategoryOpen, remove, onRemove, category, snackbar, handleCategory };
   }
 }
 </script>
