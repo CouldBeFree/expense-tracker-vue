@@ -56,13 +56,50 @@
             </template>
           </v-card>
         </v-col>
+        <v-col sm="4">
+          <v-card color="primary">
+            <template v-slot:title>
+              <p class="content">
+                Recent Transactions
+              </p>
+            </template>
+
+            <template v-slot:text>
+              <v-table>
+                <thead>
+                <tr>
+                  <th class="text-center">
+                    Category
+                  </th>
+                  <th class="text-center">
+                    Date
+                  </th>
+                  <th class="text-center">
+                    Amount
+                  </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr
+                  v-for="item in desserts"
+                  :key="item.name"
+                >
+                  <td class="text-center">{{ item.category }}</td>
+                  <td class="text-center">{{ item.date }}</td>
+                  <td class="text-center">{{ item.amount }}</td>
+                </tr>
+                </tbody>
+              </v-table>
+            </template>
+          </v-card>
+        </v-col>
       </v-row>
     </v-responsive>
   </v-container>
 </template>
 
 <script>
-import { ref, computed } from "vue"
+import { ref, computed } from "vue";
 import { DoughnutChart } from 'vue-chart-3';
 import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
@@ -110,9 +147,37 @@ export default {
           text: "Doughnut"
         }
       }
-    })
+    });
 
-    return { data, options }
+    const desserts = computed(() =>([
+      {
+        category: 'Travel',
+        date: '01-12-23',
+        amount: 300
+      },
+      {
+        category: 'Travel',
+        date: '01-12-23',
+        amount: 300
+      },
+      {
+        category: 'Food',
+        date: '01-12-23',
+        amount: 300
+      },
+      {
+        category: 'Car',
+        date: '01-12-23',
+        amount: 300
+      },
+      {
+        category: 'Travel',
+        date: '01-12-23',
+        amount: 300
+      },
+    ]));
+
+    return { data, options, desserts }
   },
   components: {
     DoughnutChart
