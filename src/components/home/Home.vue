@@ -2,6 +2,12 @@
   <v-container>
     <v-responsive class="d-flex align-center text-center fill-height mt-9">
       <v-row>
+        <v-col sm="4" offset="4">
+          <datepicker-item month-picker @update:modelValue="onDateSelect" v-model="date"></datepicker-item>
+          <p>{{date}}</p>
+        </v-col>
+      </v-row>
+      <v-row>
         <v-col sm="4">
           <v-card color="primary">
             <template v-slot:title>
@@ -107,6 +113,7 @@ Chart.register(...registerables);
 export default {
   name: "home-item",
   setup() {
+    const date = ref(new Date());
     const dataValues = ref([300, 50, 100, 40, 90, 230]);
     const data = computed(() => ({
       labels: [
@@ -131,7 +138,21 @@ export default {
           hoverOffset: 4
         }
       ]
-    }))
+    }));
+
+    const month = ref({
+      month: new Date().getMonth(),
+      year: new Date().getFullYear()
+    });
+
+    // First day of the month
+    // const dt = new Date(2023, 1);
+    // const dateStr = '2023-01-01';
+    //
+    // const date = new Date(dateStr);
+    //
+    // const iso = date.toISOString();
+    // console.log(iso);
 
     const options = ref({
       responsive: true,
@@ -177,7 +198,12 @@ export default {
       },
     ]));
 
-    return { data, options, desserts }
+    const onDateSelect = (val) => {
+      console.log('v', val);
+      // data.value = val;
+    }
+
+    return { data, options, desserts, date, onDateSelect }
   },
   components: {
     DoughnutChart
