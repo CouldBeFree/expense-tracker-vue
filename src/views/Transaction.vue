@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Transactions from '@/components/transactions/transactions.vue';
+import Transactions from '@/components/transactions/Transactions.vue';
 export default {
   name: "transaction-page",
   components: {

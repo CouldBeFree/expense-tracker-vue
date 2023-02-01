@@ -3,8 +3,7 @@
     <v-responsive class="d-flex align-center text-center fill-height mt-9">
       <v-row>
         <v-col sm="4" offset="4">
-          <datepicker-item month-picker @update:modelValue="onDateSelect" v-model="date"></datepicker-item>
-          <p>{{date}}</p>
+          <datepicker-item month-picker v-model="date"></datepicker-item>
         </v-col>
       </v-row>
       <v-row>
@@ -113,7 +112,10 @@ Chart.register(...registerables);
 export default {
   name: "home-item",
   setup() {
-    const date = ref(new Date());
+    const date = ref({
+      month: new Date().getMonth(),
+      year: new Date().getFullYear()
+    });
     const dataValues = ref([300, 50, 100, 40, 90, 230]);
     const data = computed(() => ({
       labels: [
@@ -139,6 +141,10 @@ export default {
         }
       ]
     }));
+    const payloadDate = computed(() => {
+      const transformedMoth = Number(date.value.month + 1);
+      return `${date.value.year}-${transformedMoth >= 10 ? transformedMoth : `0${transformedMoth}`}-01`;
+    });
 
     const month = ref({
       month: new Date().getMonth(),
@@ -203,7 +209,7 @@ export default {
       // data.value = val;
     }
 
-    return { data, options, desserts, date, onDateSelect }
+    return { data, options, desserts, date, onDateSelect, payloadDate }
   },
   components: {
     DoughnutChart

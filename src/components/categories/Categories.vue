@@ -9,9 +9,9 @@
       >
         Add new category
       </v-btn>
-      <v-row>
+      <v-row v-if="categories.length">
         <v-col sm="6" offset="3">
-          <v-card v-if="categories.length" :loading="isLoading">
+          <v-card :loading="isLoading">
             <template v-slot:text>
               <v-table>
                 <thead>
@@ -54,17 +54,6 @@
                 </tbody>
               </v-table>
             </template>
-          </v-card>
-          <v-card class="pb-2" v-else>
-            <h2>There are no categories yet</h2>
-            <v-btn
-              class="mb-2 mt-2"
-              color="primary"
-              size="default"
-              @click="onCategoryOpen"
-            >
-              Create
-            </v-btn>
           </v-card>
         </v-col>
       </v-row>
