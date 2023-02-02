@@ -56,7 +56,7 @@
                       color="error"
                       icon="mdi-delete"
                       size="x-small"
-                      @click="onRemoveClick({ name: item.name, id: item.id })"
+                      @click="onRemoveClick(item.id)"
                     ></v-btn>
                   </td>
                 </tr>
@@ -67,6 +67,42 @@
         </v-col>
       </v-row>
     </v-responsive>
+    <v-dialog
+      v-model="remove.removeDialog"
+      max-width="300"
+    >
+      <v-card>
+        <v-card-title class="text-h5 text-break">
+          Remove Transaction?
+        </v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            variant="text"
+            @click="onRemove"
+          >
+            Remove
+          </v-btn>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="remove.removeDialog = false"
+          >
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-snackbar
+      :timeout="3000"
+      v-model="snackbar.isOpen"
+      :color="snackbar.type"
+    >
+      <p class="text-center">
+        {{ snackbar.text }}
+      </p>
+    </v-snackbar>
     <v-dialog
       v-model="transaction.transactionDialog"
       max-width="400"
@@ -181,7 +217,6 @@ export default {
 
     const remove = reactive({
       removeDialog: false,
-      removeName: '',
       itemToRemoveID: null,
     });
 
@@ -219,10 +254,13 @@ export default {
               date: transaction.transactionDate
             });
           }
+          snackbar.type = 'success';
+          snackbar.text = `Transaction was successfully ${transaction.categoryID ? 'updated' : 'added'}`;
           await getTransactions();
         } catch (e) {
           console.error(e);
         } finally {
+          snackbar.isOpen = true;
           isLoading.value = false;
           transaction.transactionDialog = false;
         }
@@ -252,12 +290,40 @@ export default {
       v => !!v || 'Amount is required',
     ]);
 
+    const snackbar = reactive({
+      isOpen: false,
+      text: '',
+      type: 'success'
+    });
+
+    const onRemove = async () => {
+      isLoading.value = true;
+      try {
+        await axios.delete(`/transaction/${remove.itemToRemoveID}`);
+        await getTransactions();
+        snackbar.type = 'success';
+        snackbar.text = 'Transaction was successfully removed';
+      } catch({ message }) {
+        snackbar.type = 'error';
+        snackbar.text = `${message}`;
+      } finally {
+        isLoading.value = false;
+        snackbar.isOpen = true;
+        remove.removeDialog = false;
+      }
+    }
+
+    const onRemoveClick = (id) => {
+      remove.removeDialog = true;
+      remove.itemToRemoveID = id;
+    }
+
     onMounted(() => {
       getCategories();
       getTransactions();
     });
 
-    return { onTransactionOpen, transactions, transaction, categories, categoryValues, categoryRule, handleTransaction, valid, amountRule, form, date, format };
+    return { onTransactionOpen, remove, transactions, snackbar, onRemove, transaction, categories, categoryValues, categoryRule, handleTransaction, valid, amountRule, form, date, format, onRemoveClick };
   }
 }
 </script>
