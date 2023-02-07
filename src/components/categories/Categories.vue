@@ -163,6 +163,7 @@
 <script>
 import axios from "@/utils/axios";
 import { ref, onMounted, reactive } from 'vue';
+import { DEFAULT_CATEGORY_COLOR } from '@/constants/common'
 
 export default {
   name: "categories-item",
@@ -196,7 +197,7 @@ export default {
 
     const onEditOpen = (data) => {
       const { name, type, id, color } = data;
-      console.log(data);
+      console.log(DEFAULT_CATEGORY_COLOR);
       category.categoryName = name;
       category.categoryID = id;
       category.categoryType = type;
@@ -208,6 +209,7 @@ export default {
       category.categoryName = '';
       category.categoryID = '';
       category.categoryType = '';
+      category.categoryColor = DEFAULT_CATEGORY_COLOR;
       category.categoryDialog = true;
     };
 
