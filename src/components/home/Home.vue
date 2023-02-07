@@ -104,39 +104,28 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { DoughnutChart } from 'vue-chart-3';
 import { Chart, registerables } from "chart.js";
+import axios from "@/utils/axios";
 Chart.register(...registerables);
 
 export default {
   name: "home-item",
   setup() {
+    //transaction-by-category
     const date = ref({
       month: new Date().getMonth(),
       year: new Date().getFullYear()
     });
+    const chartData = ref([]);
     const dataValues = ref([300, 50, 100, 40, 90, 230]);
     const data = computed(() => ({
-      labels: [
-        'Travel',
-        'Health Care',
-        'Garments',
-        'Grocery',
-        'Eating Outside',
-        'Entertainments',
-      ],
+      labels: chartData.value.length ? chartData.value.map(el => el?.category[0].name) : [],
       datasets: [
         {
-          data: dataValues.value,
-          backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 205, 86)',
-            'rgba(12, 18, 30)',
-            'rgba(18, 235, 190)',
-            'rgba(235, 208, 18)',
-          ],
+          data: chartData.value.length ? chartData.value.map(el => el?.total) : [],
+          backgroundColor: chartData.value.map(el => el?.category[0].color),
           hoverOffset: 4
         }
       ]
@@ -204,12 +193,20 @@ export default {
       },
     ]));
 
+    const getChartData = async () => {
+      chartData.value = await axios.get('/transaction-by-category');
+    }
+
+    onMounted(() => {
+      getChartData();
+    });
+
     const onDateSelect = (val) => {
       console.log('v', val);
       // data.value = val;
     }
 
-    return { data, options, desserts, date, onDateSelect, payloadDate }
+    return { data, options, desserts, date, onDateSelect, payloadDate, chartData }
   },
   components: {
     DoughnutChart

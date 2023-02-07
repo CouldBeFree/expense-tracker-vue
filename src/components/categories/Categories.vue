@@ -98,7 +98,7 @@
       <v-card>
         <v-card-title class="text-h5 text-break">
           <p>
-            {{category.categoryID.length ? 'Edit' : 'Add'}} category {{category.categoryColor}}
+            {{category.categoryID.length ? 'Edit' : 'Add'}} category
           </p>
         </v-card-title>
         <v-card-item>
@@ -163,7 +163,7 @@
 <script>
 import axios from "@/utils/axios";
 import { ref, onMounted, reactive } from 'vue';
-import { DEFAULT_CATEGORY_COLOR } from '@/constants/common'
+import { DEFAULT_CATEGORY_COLOR } from '@/constants/common';
 
 export default {
   name: "categories-item",
@@ -186,7 +186,7 @@ export default {
       categoryName: '',
       categoryType: '',
       categoryID: '',
-      categoryColor: '#171717'
+      categoryColor: DEFAULT_CATEGORY_COLOR
     });
 
     const remove = reactive({
@@ -197,7 +197,6 @@ export default {
 
     const onEditOpen = (data) => {
       const { name, type, id, color } = data;
-      console.log(DEFAULT_CATEGORY_COLOR);
       category.categoryName = name;
       category.categoryID = id;
       category.categoryType = type;
