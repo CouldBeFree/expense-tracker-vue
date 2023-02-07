@@ -11,7 +11,7 @@
       </v-btn>
       <v-row v-if="categories.length">
         <v-col sm="6" offset="3">
-          <v-card :loading="isLoading">
+          <v-card :loading="isLoading" class="mb-5">
             <template v-slot:text>
               <v-table>
                 <thead>
@@ -21,6 +21,9 @@
                   </th>
                   <th class="text-center">
                     Type
+                  </th>
+                  <th class="text-center">
+                    Color
                   </th>
                   <th class="text-center">
                     Actions
@@ -35,12 +38,15 @@
                   <td class="text-center">{{ item.name }}</td>
                   <td class="text-center">{{ item.type }}</td>
                   <td class="text-center">
+                    <div class="background-block" :style="{background: item.color}"></div>
+                  </td>
+                  <td class="text-center">
                     <v-btn
                       color="primary"
                       icon="mdi-pencil"
                       size="x-small"
                       class="mr-1"
-                      @click="onEditOpen({ name: item.name, type: item.type, id: item.id })"
+                      @click="onEditOpen({ name: item.name, type: item.type, id: item.id, color: item.color })"
                     ></v-btn>
                     <v-btn
                       class="ml-1"
@@ -91,7 +97,9 @@
     >
       <v-card>
         <v-card-title class="text-h5 text-break">
-          {{category.categoryID.length ? 'Edit' : 'Add'}} category
+          <p>
+            {{category.categoryID.length ? 'Edit' : 'Add'}} category {{category.categoryColor}}
+          </p>
         </v-card-title>
         <v-card-item>
           <v-form
@@ -116,6 +124,9 @@
               v-model="category.categoryType"
               variant="underlined"
             ></v-select>
+            <div class="d-flex justify-center mb-2">
+              <v-color-picker v-model="category.categoryColor" hide-inputs></v-color-picker>
+            </div>
           </v-form>
         </v-card-item>
         <v-card-actions>
@@ -173,7 +184,8 @@ export default {
       categoryDialog: false,
       categoryName: '',
       categoryType: '',
-      categoryID: ''
+      categoryID: '',
+      categoryColor: '#171717'
     });
 
     const remove = reactive({
@@ -183,10 +195,12 @@ export default {
     });
 
     const onEditOpen = (data) => {
-      const { name, type, id } = data;
+      const { name, type, id, color } = data;
+      console.log(data);
       category.categoryName = name;
       category.categoryID = id;
       category.categoryType = type;
+      category.categoryColor = color;
       category.categoryDialog = true;
     }
 
@@ -250,12 +264,14 @@ export default {
           if (category.categoryID) {
             await axios.put(`/category/${category.categoryID}`, {
               name: category.categoryName,
-              type: category.categoryType
+              type: category.categoryType,
+              color: category.categoryColor
             });
           } else {
             await axios.post('/create-category', {
               name: category.categoryName,
-              type: category.categoryType
+              type: category.categoryType,
+              color: category.categoryColor
             });
           }
           await getCategories();
@@ -282,5 +298,9 @@ export default {
 </script>
 
 <style scoped>
-
+.background-block {
+  margin: 0 auto;
+  width: 15px;
+  height: 15px;
+}
 </style>

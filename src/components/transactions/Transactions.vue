@@ -49,7 +49,7 @@
                       icon="mdi-pencil"
                       size="x-small"
                       class="mr-1"
-                      @click="onEditOpen({ name: item.name, type: item.type, id: item.id })"
+                      @click="onEditOpen(item)"
                     ></v-btn>
                     <v-btn
                       class="ml-1"
@@ -109,7 +109,7 @@
     >
       <v-card>
         <v-card-title class="text-h5 text-break">
-          Add Transaction
+          {{transaction.transactionID.length ? 'Edit Transaction' : 'Add Transaction'}}
         </v-card-title>
         <v-card-item>
           <v-form
@@ -145,8 +145,7 @@
             variant="text"
             @click="handleTransaction"
           >
-<!--            {{category.categoryID.length ? 'Edit' : 'Add'}}-->
-            Add
+            {{transaction.transactionID.length ? 'Edit' : 'Add'}}
           </v-btn>
           <v-btn
             color="green-darken-1"
@@ -196,6 +195,7 @@ export default {
     });
 
     const onTransactionOpen = () => {
+      date.value = new Date();
       transaction.transactionID = '';
       transaction.transactionName = '';
       transaction.transactionCategoryID = '';
@@ -221,11 +221,13 @@ export default {
     });
 
     const onEditOpen = (data) => {
-      const { name, type, id } = data;
-      transaction.categoryName = name;
-      transaction.categoryID = id;
-      transaction.categoryType = type;
-      transaction.categoryDialog = true;
+      const { date: transactionDate, amount, cat, id } = data;
+      const { name: categoryName } = cat[0];
+      date.value = transactionDate;
+      transaction.transactionCategory = categoryName
+      transaction.transactionAmount = amount;
+      transaction.transactionID = id;
+      transaction.transactionDialog = true;
     };
 
     const getTransactions = async () => {
@@ -245,20 +247,22 @@ export default {
       if (valid) {
         isLoading.value = true;
         try {
+          const payload = {
+            amount: +transaction.transactionAmount,
+            category: transaction.transactionCategoryID,
+            date: transaction.transactionDate
+          }
           if (transaction.transactionID.length) {
-            // PUT
+            await axios.put(`/transaction/${transaction.transactionID}`, { ...payload });
           } else {
-            await axios.post('/create-transaction', {
-              amount: transaction.transactionAmount,
-              category: transaction.transactionCategoryID,
-              date: transaction.transactionDate
-            });
+            await axios.post('/create-transaction', { ...payload });
           }
           snackbar.type = 'success';
           snackbar.text = `Transaction was successfully ${transaction.categoryID ? 'updated' : 'added'}`;
           await getTransactions();
-        } catch (e) {
-          console.error(e);
+        } catch ({ message }) {
+          snackbar.type = 'error';
+          snackbar.text = `${message}`;
         } finally {
           snackbar.isOpen = true;
           isLoading.value = false;
@@ -323,7 +327,7 @@ export default {
       getTransactions();
     });
 
-    return { onTransactionOpen, remove, transactions, snackbar, onRemove, transaction, categories, categoryValues, categoryRule, handleTransaction, valid, amountRule, form, date, format, onRemoveClick };
+    return { onTransactionOpen, remove, transactions, snackbar, onEditOpen, onRemove, transaction, categories, categoryValues, categoryRule, handleTransaction, valid, amountRule, form, date, format, onRemoveClick };
   }
 }
 </script>
