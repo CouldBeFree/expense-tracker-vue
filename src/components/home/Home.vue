@@ -86,12 +86,14 @@
                 </thead>
                 <tbody>
                 <tr
-                  v-for="item in desserts"
-                  :key="item.name"
+                  v-for="item in recentTransactions"
+                  :key="item.id"
                 >
-                  <td class="text-center">{{ item.category }}</td>
+                  <td class="text-center">{{ item?.cat[0].name }}</td>
                   <td class="text-center">{{ item.date }}</td>
-                  <td class="text-center">{{ item.amount }}</td>
+                  <td class="text-center" :class="{ 'expense': item.cat[0].type === CATEGORY_TYPES.EXPENSE, 'income': item.cat[0].type === CATEGORY_TYPES.INCOME }">
+                    {{item.cat[0].type === CATEGORY_TYPES.EXPENSE ? '-' : '+'}}{{ item.amount }}
+                  </td>
                 </tr>
                 </tbody>
               </v-table>
@@ -105,6 +107,7 @@
 
 <script>
 import { ref, computed, onMounted } from "vue";
+import { CATEGORY_TYPES } from '@/constants/common';
 import { DoughnutChart } from 'vue-chart-3';
 import { Chart, registerables } from "chart.js";
 import axios from "@/utils/axios";
@@ -119,7 +122,7 @@ export default {
       year: new Date().getFullYear()
     });
     const chartData = ref([]);
-    const dataValues = ref([300, 50, 100, 40, 90, 230]);
+    const recentTransactions = ref([]);
     const data = computed(() => ({
       labels: chartData.value.length ? chartData.value.map(el => el?.category[0].name) : [],
       datasets: [
@@ -165,40 +168,30 @@ export default {
       }
     });
 
-    const desserts = computed(() =>([
-      {
-        category: 'Travel',
-        date: '01-12-23',
-        amount: 300
-      },
-      {
-        category: 'Travel',
-        date: '01-12-23',
-        amount: 300
-      },
-      {
-        category: 'Food',
-        date: '01-12-23',
-        amount: 300
-      },
-      {
-        category: 'Car',
-        date: '01-12-23',
-        amount: 300
-      },
-      {
-        category: 'Travel',
-        date: '01-12-23',
-        amount: 300
-      },
-    ]));
-
     const getChartData = async () => {
-      chartData.value = await axios.get('/transaction-by-category');
+      try {
+        const data = await axios.get('/transaction-by-category');
+        chartData.value = data.filter(el => el.category[0].type === CATEGORY_TYPES.EXPENSE);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    const getTransactions = async () => {
+      try {
+        recentTransactions.value = await axios.get('/transactions', {
+          params: {
+            limit: 5
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     onMounted(() => {
       getChartData();
+      getTransactions();
     });
 
     const onDateSelect = (val) => {
@@ -206,7 +199,7 @@ export default {
       // data.value = val;
     }
 
-    return { data, options, desserts, date, onDateSelect, payloadDate, chartData }
+    return { data, options, date, onDateSelect, payloadDate, chartData, recentTransactions, CATEGORY_TYPES }
   },
   components: {
     DoughnutChart
@@ -217,5 +210,13 @@ export default {
 <style scoped>
 .content {
   font-size: 18px;
+}
+
+.expense {
+  color: red;
+}
+
+.income {
+  color: green;
 }
 </style>

@@ -39,9 +39,9 @@
                   <td class="text-center">{{ item.date }}</td>
                   <td
                     class="text-center"
-                    :class="{ 'expense': item.cat[0].type === 'Expense', 'income': item.cat[0].type === 'Income' }"
+                    :class="{ 'expense': item.cat[0].type === CATEGORY_TYPES.EXPENSE, 'income': item.cat[0].type === CATEGORY_TYPES.INCOME }"
                   >
-                    {{item.cat[0].type === 'Expense' ? '-' : '+'}}{{ item.amount }}
+                    {{item.cat[0].type === CATEGORY_TYPES.EXPENSE ? '-' : '+'}}{{ item.amount }}
                   </td>
                   <td class="text-center">
                     <v-btn
@@ -162,6 +162,7 @@
 
 <script>
 import { ref, onMounted, reactive, computed, watch, toRaw } from 'vue';
+import { CATEGORY_TYPES } from '@/constants/common';
 import axios from "@/utils/axios";
 export default {
   name: "transactions-item",
@@ -327,7 +328,7 @@ export default {
       getTransactions();
     });
 
-    return { onTransactionOpen, remove, transactions, snackbar, onEditOpen, onRemove, transaction, categories, categoryValues, categoryRule, handleTransaction, valid, amountRule, form, date, format, onRemoveClick };
+    return { onTransactionOpen, remove, transactions, snackbar, onEditOpen, CATEGORY_TYPES, onRemove, transaction, categories, categoryValues, categoryRule, handleTransaction, valid, amountRule, form, date, format, onRemoveClick };
   }
 }
 </script>
