@@ -14,7 +14,7 @@
             </template>
 
             <template v-slot:text>
-              <div class="content">$10,000</div>
+              <div class="content">${{calculateTotal.income}}</div>
             </template>
           </v-card>
         </v-col>
@@ -26,7 +26,7 @@
 
             <template v-slot:text>
               <p class="content">
-                $2,350
+                ${{calculateTotal.expense}}
               </p>
             </template>
           </v-card>
@@ -40,7 +40,7 @@
             </template>
 
             <template v-slot:text>
-              <p class="content">$2,350</p>
+              <p class="content">${{calculateTotal.income - calculateTotal.expense}}</p>
             </template>
           </v-card>
         </v-col>
@@ -106,7 +106,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, toRaw } from "vue";
 import { CATEGORY_TYPES } from '@/constants/common';
 import { DoughnutChart } from 'vue-chart-3';
 import { Chart, registerables } from "chart.js";
@@ -116,13 +116,30 @@ Chart.register(...registerables);
 export default {
   name: "home-item",
   setup() {
-    //transaction-by-category
     const date = ref({
       month: new Date().getMonth(),
       year: new Date().getFullYear()
     });
     const chartData = ref([]);
+    const total = ref([]);
     const recentTransactions = ref([]);
+    const calculateTotal = computed(function () {
+      const output = {
+        expense: 0,
+        income: 0
+      }
+
+      total.value.forEach(el => {
+        if (el?.category[0].type === "Expense") {
+          output.expense += +el?.total;
+        }
+        if (el?.category[0].type === "Income") {
+          output.income += +el?.total;
+        }
+      });
+
+      return output;
+    });
     const data = computed(() => ({
       labels: chartData.value.length ? chartData.value.map(el => el?.category[0].name) : [],
       datasets: [
@@ -171,6 +188,7 @@ export default {
     const getChartData = async () => {
       try {
         const data = await axios.get('/transaction-by-category');
+        total.value = data;
         chartData.value = data.filter(el => el.category[0].type === CATEGORY_TYPES.EXPENSE);
       } catch (e) {
         console.error(e);
@@ -199,7 +217,7 @@ export default {
       // data.value = val;
     }
 
-    return { data, options, date, onDateSelect, payloadDate, chartData, recentTransactions, CATEGORY_TYPES }
+    return { data, options, date, calculateTotal, onDateSelect, payloadDate, chartData, recentTransactions, CATEGORY_TYPES }
   },
   components: {
     DoughnutChart

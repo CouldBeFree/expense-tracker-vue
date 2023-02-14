@@ -11,7 +11,7 @@
       </v-btn>
       <v-row v-if="transactions.length">
         <v-col sm="6" offset="3">
-          <v-card>
+          <v-card class="mb-5">
             <template v-slot:text>
               <v-table>
                 <thead>
@@ -234,7 +234,11 @@ export default {
     const getTransactions = async () => {
       isLoading.value = true;
       try {
-        transactions.value = await axios.get('/transactions');
+        transactions.value = await axios.get('/transactions', {
+          params: {
+            limit: 10000
+          }
+        });
       } catch (e) {
         console.error(e);
       } finally {
